@@ -1,0 +1,279 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+  width: 100%;
+}
+
+body {
+  background: #000;
+  color: #f5f5f5;
+  font-family: "Courier New", Courier, monospace;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.terminal-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(0, 255, 100, 0.04),
+      transparent 35%
+    ),
+    #000;
+}
+
+.terminal-container {
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+.featured {
+  padding: 18px;
+  text-align: center;
+  color: #00d84a;
+  border-bottom: 1px solid #064d20;
+  font-size: 18px;
+}
+
+.hero {
+  text-align: center;
+  padding: 42px 20px 32px;
+  border-bottom: 1px solid #064d20;
+}
+
+.hero h1 {
+  margin: 0;
+  color: #00d84a;
+  font-size: clamp(38px, 7vw, 70px);
+  letter-spacing: 2px;
+}
+
+.hero p {
+  margin: 12px 0 0;
+  color: #888;
+  font-size: clamp(18px, 3vw, 28px);
+}
+
+.terminal {
+  padding: 35px 30px 50px;
+  min-height: 650px;
+  font-size: 20px;
+  line-height: 1.65;
+}
+
+.prompt {
+  color: #fff;
+}
+
+.blue {
+  color: #4da3ff;
+}
+
+.green {
+  color: #00d84a;
+}
+
+.welcome {
+  margin-bottom: 30px;
+}
+
+.message {
+  margin: 18px 0;
+  max-width: 900px;
+}
+
+.history {
+  margin-top: 20px;
+}
+
+.command-block {
+  margin: 28px 0;
+}
+
+.command-block pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 12px 0 0;
+  color: #eee;
+  font-family: inherit;
+}
+
+.command-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 30px;
+}
+
+.command-form input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  caret-color: #00d84a;
+}
+
+footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 30px;
+  border-top: 1px solid #064d20;
+  color: #555;
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .featured {
+    font-size: 15px;
+  }
+
+  .hero {
+    padding: 30px 15px;
+  }
+
+  .terminal {
+    padding: 25px 18px 40px;
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  footer {
+    padding: 18px;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+/* ============================= */
+/* PROJECTS                      */
+/* ============================= */
+
+.projects-section {
+  margin-top: 70px;
+}
+
+.section-title {
+  font-family: monospace;
+  font-size: 14px;
+  letter-spacing: 2px;
+  margin-bottom: 25px;
+  color: #ffffff;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.project-card {
+  position: relative;
+  padding: 28px;
+  border: 1px solid rgba(0, 216, 74, 0.25);
+  background: rgba(0, 0, 0, 0.45);
+  transition: all 0.25s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-5px);
+  border-color: #00d84a;
+  box-shadow: 0 0 25px rgba(0, 216, 74, 0.12);
+}
+
+.project-number {
+  font-family: monospace;
+  color: #00d84a;
+  font-size: 13px;
+  margin-bottom: 15px;
+}
+
+.project-card h2 {
+  margin: 0 0 12px;
+  font-family: monospace;
+  font-size: 22px;
+  color: #ffffff;
+}
+
+.project-card p {
+  color: #a7a7a7;
+  line-height: 1.7;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.tech-stack span {
+  border: 1px solid rgba(0, 216, 74, 0.25);
+  padding: 5px 9px;
+  font-family: monospace;
+  font-size: 11px;
+  color: #00d84a;
+}
+
+.project-links {
+  display: flex;
+  gap: 18px;
+}
+
+.project-links a {
+  color: #4da3ff;
+  text-decoration: none;
+  font-family: monospace;
+  font-size: 13px;
+}
+
+.project-links a:hover {
+  color: #00d84a;
+}
+
+/* ============================= */
+/* MOBILE                       */
+/* ============================= */
+
+@media (max-width: 700px) {
+  .project-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .project-card {
+    padding: 22px;
+  }
+}
+.resume-section {
+  margin-top: 45px;
+  text-align: center;
+}
+
+.resume-button {
+  display: inline-block;
+  padding: 12px 22px;
+  border: 1px solid #00d84a;
+  color: #00d84a;
+  text-decoration: none;
+  font-family: monospace;
+  transition: all 0.25s ease;
+}
+
+.resume-button:hover {
+  background: #00d84a;
+  color: #000;
+  box-shadow: 0 0 20px rgba(0, 216, 74, 0.25);
+}
