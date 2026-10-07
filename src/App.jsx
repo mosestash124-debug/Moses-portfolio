@@ -1,13 +1,60 @@
 import { useState, useRef, useEffect } from "react";
 import "./App.css";
 
+const bootLines = [
+  "POWER ON  |  MOSESOS PORTFOLIO ENVIRONMENT",
+  "CHECK  |  BROWSER RUNTIME INITIALIZED",
+  "MOUNT  |  LOADING PORTFOLIO INTERFACE",
+  "PROFILE  |  MOSES GITAU",
+  "MODULE  |  PROJECT INDEX READY",
+  "ASSET  |  CV DOCUMENT AVAILABLE",
+  "LINK  |  GITHUB PROFILE CONFIGURED",
+  "SERVICE  |  INTERACTIVE TERMINAL READY",
+  "START  |  WELCOME TO THE PORTFOLIO",
+];
+
+function TypingText({ text, speed = 16, className = "", cursorClassName = "" }) {
+  const [displayed, setDisplayed] = useState("");
+
+  useEffect(() => {
+    let index = 0;
+    const timer = setInterval(() => {
+      index += 1;
+      setDisplayed(text.slice(0, index));
+
+      if (index >= text.length) {
+        clearInterval(timer);
+      }
+    }, speed);
+
+    return () => clearInterval(timer);
+  }, [text, speed]);
+
+  return (
+    <span className={className}>
+      {displayed}
+      {displayed.length < text.length && (
+        <span className={`typing-cursor ${cursorClassName}`} aria-hidden="true" />
+      )}
+    </span>
+  );
+}
+
 function App() {
   const [history, setHistory] = useState([]);
   const [input, setInput] = useState("");
   const [commandHistory, setCommandHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+  const [typedIntro, setTypedIntro] = useState("");
+  const [bootSequence, setBootSequence] = useState([]);
+  const [bootExiting, setBootExiting] = useState(false);
+  const [bootComplete, setBootComplete] = useState(() =>
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
 
   const terminalRef = useRef(null);
+  const introText =
+    "Hi, I'm Moses Gitau — a Mathematics & Computer Science student and developer.";
 
   const projects = [
     {
@@ -409,26 +456,165 @@ Type "help" to see available commands.`;
   };
 
   useEffect(() => {
+    let frame;
+    if (!typedIntro && introText) {
+      let index = 0;
+      frame = setInterval(() => {
+        index += 1;
+        setTypedIntro(introText.slice(0, index));
+
+        if (index >= introText.length) {
+          clearInterval(frame);
+        }
+      }, 22);
+    }
+
+    return () => clearInterval(frame);
+  }, [typedIntro]);
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (prefersReducedMotion) {
+      return undefined;
+    }
+
+    const timers = [];
+
+    bootLines.forEach((line, index) => {
+      const timer = setTimeout(() => {
+        setBootSequence((prev) => [...prev, line]);
+      }, index * 320 + 120);
+      timers.push(timer);
+    });
+
+    const exitTimer = setTimeout(() => {
+      setBootExiting(true);
+    }, bootLines.length * 320 + 350);
+    timers.push(exitTimer);
+
+    const finishTimer = setTimeout(() => {
+      setBootComplete(true);
+    }, bootLines.length * 320 + 850);
+    timers.push(finishTimer);
+
+    return () => timers.forEach((timer) => clearTimeout(timer));
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    const revealTargets = document.querySelectorAll(".reveal-on-scroll");
+    revealTargets.forEach((element) => observer.observe(element));
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     terminalRef.current?.scrollIntoView({
       behavior: "smooth",
       block: "end",
     });
   }, [history]);
 
+  const getOutputTone = (command) => {
+    if (["github", "linkedin", "resume"].includes(command)) return "success";
+    if (["clear"].includes(command)) return "neutral";
+    if (["help", "whoami", "about", "contact"].includes(command)) return "info";
+    return "warning";
+  };
+
   return (
     <main className="terminal-page">
       <div className="terminal-container">
+
+        {!bootComplete && (
+          <div
+            className={`boot-screen${bootExiting ? " exiting" : ""}`}
+            aria-live="polite"
+            aria-label="Simulated portfolio startup sequence"
+          >
+            <div className="boot-window">
+              <div className="boot-window-bar">
+                <span className="boot-lights" aria-hidden="true">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+                <span>MOSESOS // LOCAL STARTUP</span>
+                <span className="boot-version">v1.0</span>
+              </div>
+              <div className="boot-content">
+                <div className="boot-header">SYSTEM INITIALIZATION</div>
+                <div className="boot-log">
+                  {bootSequence.map((line, index) => (
+                    <div className="boot-line" key={line}>
+                      <span className="boot-timestamp">
+                        [{(index * 0.32).toFixed(2)}s]
+                      </span>
+                      <span className={index === bootSequence.length - 1 ? "boot-current" : ""}>
+                        {line}
+                      </span>
+                      <span className="boot-ok">[ OK ]</span>
+                    </div>
+                  ))}
+                  {!bootExiting && <span className="boot-caret" aria-hidden="true" />}
+                </div>
+                <div
+                  className="boot-progress"
+                  role="progressbar"
+                  aria-label="Portfolio startup progress"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow={Math.round(
+                    (bootSequence.length / bootLines.length) * 100
+                  )}
+                >
+                  <span
+                    style={{
+                      width: `${(bootSequence.length / bootLines.length) * 100}%`,
+                    }}
+                  />
+                </div>
+                <div className="boot-status">
+                  <span>
+                    {bootExiting ? "HANDING OFF TO PORTFOLIO" : "STARTING UP"}
+                  </span>
+                  <span>
+                    {Math.round((bootSequence.length / bootLines.length) * 100)}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="featured">
           Featured on GitHub ↗
         </div>
 
-        <header className="hero">
+        <div className="banner-strip reveal-on-scroll">
+          <span className="green">[ READY ]</span> SYSTEM ONLINE • MOSES GITAU • PORTFOLIO TERMINAL
+        </div>
+
+        <header className="hero reveal-on-scroll">
           <h1>Moses Gitau</h1>
           <p>Mathematics &amp; Computer Science</p>
         </header>
 
-        <section className="terminal">
+        <section className="terminal reveal-on-scroll">
 
           <div className="welcome">
 
@@ -439,9 +625,9 @@ Type "help" to see available commands.`;
               <span className="green">welcome</span>
             </div>
 
-            <div className="message">
-              Hi, I'm Moses Gitau — a Mathematics &amp;
-              Computer Science student and developer.
+            <div className="message typed-message" aria-live="polite">
+              {typedIntro}
+              <span className="typing-cursor" aria-hidden="true" />
             </div>
             <div className="resume-section">
   <a
@@ -470,16 +656,28 @@ Type "help" to see available commands.`;
             {history.map((item, index) => (
               <div
                 className="command-block"
-                key={index}
+                key={`${item.command}-${index}`}
               >
                 <div className="prompt">
                   <span className="blue">
                     moses@portfolio:~$
                   </span>{" "}
-                  {item.command}
+                  <TypingText
+                    text={item.command}
+                    speed={18}
+                    className="command-text"
+                    cursorClassName="command-cursor"
+                  />
                 </div>
 
-                <pre>{item.output}</pre>
+                <pre className={`output-shell ${getOutputTone(item.command)}`}>
+                  <TypingText
+                    text={item.output}
+                    speed={10}
+                    className="output-text"
+                    cursorClassName="output-cursor"
+                  />
+                </pre>
               </div>
             ))}
 
@@ -494,18 +692,21 @@ Type "help" to see available commands.`;
               moses@portfolio:~$
             </span>
 
-            <input
-              autoFocus
-              value={input}
-              onChange={(e) => {
-                setInput(e.target.value);
-                setHistoryIndex(-1);
-              }}
-              onKeyDown={handleKeyDown}
-              aria-label="Terminal command"
-              autoComplete="off"
-              spellCheck="false"
-            />
+            <div className="input-shell">
+              <input
+                autoFocus
+                value={input}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  setHistoryIndex(-1);
+                }}
+                onKeyDown={handleKeyDown}
+                aria-label="Terminal command"
+                autoComplete="off"
+                spellCheck="false"
+              />
+              <span className="input-cursor" aria-hidden="true" />
+            </div>
 
           </form>
 
@@ -515,7 +716,7 @@ Type "help" to see available commands.`;
 
         {/* PROJECT CARDS */}
 
-        <section className="projects-section">
+        <section className="projects-section reveal-on-scroll">
 
           <div className="section-title">
             <span className="green">01.</span>{" "}
@@ -526,7 +727,7 @@ Type "help" to see available commands.`;
 
             {projects.map((project, index) => (
               <article
-                className="project-card"
+                className="project-card reveal-on-scroll"
                 key={project.name}
               >
 
@@ -581,7 +782,7 @@ Type "help" to see available commands.`;
 
         </section>
 
-        <footer>
+        <footer className="reveal-on-scroll">
 
           <span>
             © {new Date().getFullYear()} Moses Gitau
